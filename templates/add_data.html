@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Training Data - {{ model_name }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      text-align: center;
+      padding: 50px;
+    }
+    h3 {
+      color: #333;
+      font-size: 26px;
+    }
+    form {
+      margin-top: 40px;
+    }
+    input, select {
+      padding: 10px;
+      width: 280px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0069d9;
+    }
+    .links {
+      margin-top: 30px;
+    }
+    .links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .links a:hover {
+      color: #388E3C;
+    }
+  </style>
+</head>
+<body>
+  <h3>Add Training Data - {{ model_name }}</h3>
+  <form method="POST">
+    <input type="text" name="text" placeholder="Enter message or statement" required><br>
+    <select name="label" required>
+      <option value="">Select Label</option>
+      <option value="spam">Spam</option>
+      <option value="ham">Ham</option>
+    </select><br>
+    <button type="submit">Add Data</button>
+  </form>
+
+  <div class="links">
+    <a href="/train_model/{{ model_name }}">Train Model</a> |
+    <a href="/predict/{{ model_name }}">Predict</a> |
+    <a href="/">Home</a>
+  </div>
+</body>
+</html>
