@@ -1,36 +1,24 @@
 import os
-import pandas as pd
 import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from database import fetch_data
 
-def train_model(model_folder):
-    db_path = os.path.join(model_folder, "data.db")
-    data = fetch_data(db_path)
-    if not data:
-        return "No data to train!"
+def train_and_save_model(df, model_dir, data_field):
+    X = df[data_field]
+    y = df['label']
 
-    texts, labels = zip(*data)
     vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(texts)
+    X_vec = vectorizer.fit_transform(X)
 
     model = MultinomialNB()
-    model.fit(X, labels)
+    model.fit(X_vec, y)
 
-    joblib.dump((vectorizer, model), os.path.join(model_folder, "model.pkl"))
+    joblib.dump(model, os.path.join(model_dir, 'model.pkl'))
+    joblib.dump(vectorizer, os.path.join(model_dir, 'vectorizer.pkl'))
 
-    df = pd.DataFrame(data, columns=["text", "label"])
-    df.to_excel(os.path.join(model_folder, "dataset.xlsx"), index=False)
+def load_model_and_predict(model_dir, text):
+    model = joblib.load(os.path.join(model_dir, 'model.pkl'))
+    vectorizer = joblib.load(os.path.join(model_dir, 'vectorizer.pkl'))
 
-    return "Model trained successfully!"
-
-def predict(model_folder, text):
-    model_path = os.path.join(model_folder, "model.pkl")
-    if not os.path.exists(model_path):
-        return "Model not trained yet!"
-    
-    vectorizer, model = joblib.load(model_path)
-    X = vectorizer.transform([text])
-    prediction = model.predict(X)[0]
-    return prediction
+    X_vec = vectorizer.transform([text])
+    return model.predict(X_vec)[0]

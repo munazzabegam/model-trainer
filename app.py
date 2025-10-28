@@ -1,94 +1,55 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
-import os
-import pandas as pd
-from datetime import datetime
-from io import BytesIO
+from flask import Flask, request, redirect, render_template
+from database import init_db, save_model_metadata, get_model_details, get_all_models
 
 app = Flask(__name__)
+init_db()
 
-# ✅ Database directory
-DB_DIR = "database"
-os.makedirs(DB_DIR, exist_ok=True)
+def tuple_to_dict(model_tuple):
+    return {
+        "id": model_tuple[0],
+        "name": model_tuple[1],
+        "data_field": model_tuple[2],
+        "labels": model_tuple[3]
+    }
 
-
-# 🧩 Home Page – Create or Load Model
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def index():
+    models = [tuple_to_dict(m) for m in get_all_models()]
+    return render_template("index.html", models=models)
+
+@app.route("/create_model", methods=["GET", "POST"])
+def create_model():
     if request.method == "POST":
-        model_name = request.form["model_name"].strip().replace(" ", "_")
-        question_col = request.form["question_col"]
-        answer_col = request.form["answer_col"]
+        model_name = request.form.get("name")
+        data_field = request.form.get("data_field")
+        labels_str = request.form.get("labels")
 
-        model_path = os.path.join(DB_DIR, f"{model_name}.xlsx")
+        model_id = save_model_metadata(model_name, data_field, labels_str)
+        return redirect(f"/model/{model_id}")
+    return render_template("create_model.html")
 
-        # If file doesn't exist, create a new dataset
-        if not os.path.exists(model_path):
-            df = pd.DataFrame(columns=[question_col, answer_col, "Feedback"])
-            df.to_excel(model_path, index=False)
+@app.route("/model/<int:model_id>")
+def model_detail(model_id):
+    model_tuple = get_model_details(model_id)
+    if not model_tuple:
+        return "Model not found", 404
+    model = tuple_to_dict(model_tuple)
+    return render_template("model_detail.html", model=model)
 
-        # ✅ Redirect to add data page
-        return redirect(url_for("add_data_route", model_name=model_name))
-    return render_template("index.html")
-
-
-# 🧾 Add Data Page – Enter Question and Answer Options
-@app.route("/add_data/<model_name>", methods=["GET", "POST"])
-def add_data_route(model_name):
-    model_path = os.path.join(DB_DIR, f"{model_name}.xlsx")
-
-    if not os.path.exists(model_path):
-        return "Model not found. Please go back and create one."
-
-    df = pd.read_excel(model_path)
+@app.route("/add_data/<int:model_id>", methods=["GET", "POST"])
+def add_data(model_id):
+    model_tuple = get_model_details(model_id)
+    if not model_tuple:
+        return "Model not found", 404
+    model = tuple_to_dict(model_tuple)
 
     if request.method == "POST":
-        question = request.form["question"]
-        answer = request.form["answer"]
-        feedback = request.form.get("feedback", "")
+        data_value = request.form.get("data_value")
+        labels = request.form.get("labels")
+        # Here you can process or save the data
+        return f"Data added to model {model['id']}: {data_value}, Labels: {labels}"
 
-        # ✅ Append data to Excel
-        new_data = pd.DataFrame([[question, answer, feedback]], columns=df.columns)
-        df = pd.concat([df, new_data], ignore_index=True)
-        df.to_excel(model_path, index=False)
-
-    # ✅ Display existing dataset
-    data_preview = pd.read_excel(model_path).to_dict(orient="records")
-    return render_template("add_data.html", model_name=model_name, data=data_preview, columns=df.columns)
-
-
-# 🔁 Submit feedback for correction
-@app.route("/feedback/<model_name>", methods=["POST"])
-def feedback_route(model_name):
-    model_path = os.path.join(DB_DIR, f"{model_name}.xlsx")
-    df = pd.read_excel(model_path)
-
-    index = int(request.form["index"])
-    feedback = request.form["feedback"]
-
-    df.loc[index, "Feedback"] = feedback
-    df.to_excel(model_path, index=False)
-
-    return redirect(url_for("add_data_route", model_name=model_name))
-
-
-# 📥 Download Excel Dataset
-@app.route("/download/<model_name>")
-def download_route(model_name):
-    model_path = os.path.join(DB_DIR, f"{model_name}.xlsx")
-    if not os.path.exists(model_path):
-        return "Dataset not found."
-
-    return send_file(model_path, as_attachment=True)
-
-
-# 🗑️ Delete dataset after training
-@app.route("/delete/<model_name>")
-def delete_route(model_name):
-    model_path = os.path.join(DB_DIR, f"{model_name}.xlsx")
-    if os.path.exists(model_path):
-        os.remove(model_path)
-    return redirect(url_for("index"))
-
+    return render_template("add_data.html", model=model)
 
 if __name__ == "__main__":
     app.run(debug=True)

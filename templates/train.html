@@ -1,57 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Create Model</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef2f7;
-      text-align: center;
-      padding: 60px;
-    }
-    h3 {
-      color: #333;
-      font-size: 26px;
-    }
-    form {
-      margin-top: 40px;
-    }
-    input {
-      padding: 10px;
-      width: 280px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      background: #4CAF50;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    a {
-      display: block;
-      margin-top: 20px;
-      color: #007bff;
-      text-decoration: none;
-    }
-  </style>
-</head>
+<html>
+<head><title>Train Model</title></head>
 <body>
-  <h3>Create a New Model</h3>
+  <h2>Train Model: {{ model_name }}</h2>
   <form method="POST">
-    <input type="text" name="model_name" placeholder="Enter model name (e.g. spam_detector)" required>
-    <br>
-    <button type="submit">Create Model</button>
+    <p>Click below to train the model using the collected dataset.</p>
+    <button type="submit">Train Model</button>
   </form>
-  <a href="/">← Back to Home</a>
 </body>
 </html>

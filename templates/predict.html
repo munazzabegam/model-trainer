@@ -1,85 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Predict - {{ model_name }}</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      text-align: center;
-      padding: 50px;
-    }
-    h3 {
-      color: #333;
-      font-size: 26px;
-    }
-    form {
-      margin-top: 40px;
-    }
-    input, select {
-      padding: 10px;
-      width: 280px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      background: #28a745;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #218838;
-    }
-    p {
-      margin-top: 30px;
-      font-size: 18px;
-      color: #333;
-      background: #e9ecef;
-      display: inline-block;
-      padding: 15px 25px;
-      border-radius: 6px;
-    }
-    .links {
-      margin-top: 30px;
-    }
-    .links a {
-      margin: 0 10px;
-      text-decoration: none;
-      color: #007bff;
-      font-weight: bold;
-    }
-    .links a:hover {
-      color: #0056b3;
-    }
-  </style>
-</head>
+<html>
+<head><title>Predict</title></head>
 <body>
-  <h3>Predict - {{ model_name }}</h3>
+  <h2>Predict using {{ model_name }}</h2>
   <form method="POST">
-    <input type="text" name="text" placeholder="Enter message to predict" required><br>
-    <label>Feedback (optional):</label><br>
-    <select name="feedback">
-      <option value="">Select</option>
-      <option value="correct">Correct</option>
-      <option value="wrong">Wrong</option>
-    </select><br>
+    <label>Enter {{ data_field }}:</label><br>
+    <textarea name="text" rows="4" cols="40" required></textarea><br><br>
     <button type="submit">Predict</button>
   </form>
 
-  {% if result %}
-  <p>{{ result }}</p>
+  {% if prediction %}
+    <h3>Prediction: {{ prediction }}</h3>
   {% endif %}
-
-  <div class="links">
-    <a href="/add_data/{{ model_name }}">Add Data</a> |
-    <a href="/">Home</a>
-  </div>
 </body>
 </html>

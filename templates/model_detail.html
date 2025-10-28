@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Details</title>
+</head>
+<body>
+    <h1>Model: {{ model.name }}</h1>
+    <p><strong>ID:</strong> {{ model.id }}</p>
+    <p><strong>Data Field:</strong> {{ model.data_field }}</p>
+    <p><strong>Labels:</strong> {{ model.labels }}</p>
+    <a href="{{ url_for('add_data', model_id=model.id) }}">Add Data</a>
+</body>
+</html>
