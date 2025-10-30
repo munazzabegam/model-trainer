@@ -2,12 +2,131 @@
 <html>
 <head>
     <title>Model Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0f7fa, #f0f8ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            width: 90%;
+            padding: 30px;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        h1 { 
+            color: #1e3a8a; 
+            border-bottom: 2px solid #90caf9; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px;
+            font-weight: 400; 
+        }
+        h2 { color: #1e3a8a; margin-top: 20px; font-weight: 400; }
+        .details p { margin: 10px 0; font-size: 17px; background: #f0f8ff; padding: 8px; border-radius: 6px; }
+        .details strong { color: #007bff; font-weight: 600; }
+
+        .model-actions a {
+            display: inline-block;
+            margin-right: 15px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .model-actions .main-action { background-color: #007bff; color: white; }
+        .model-actions .download-action { background-color: #28a745; color: white; }
+        .model-actions a:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        th, td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9f5ff; /* Light blue header */
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8fafd;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Model: {{ model.name }}</h1>
-    <p><strong>ID:</strong> {{ model.id }}</p>
-    <p><strong>Data Field:</strong> {{ model.data_field }}</p>
-    <p><strong>Labels:</strong> {{ model.labels }}</p>
-    <a href="{{ url_for('add_data', model_id=model.id) }}">Add Data</a>
+    <div class="container">
+        <h1>Model: **{{ model.name }}** (ID: {{ model.id }})</h1>
+        
+        <div class="details">
+            <p><strong>Data Field:</strong> {{ model.data_field }}</p>
+            <p><strong>Labels:</strong> {{ model.labels }}</p>
+        </div>
+        
+        <hr>
+
+        <div class="model-actions">
+            <a class="main-action" href="{{ url_for('add_data', model_id=model.id) }}"><i class="bi bi-input-cursor-text"></i> Add Data</a>
+            <a class="main-action" href="{{ url_for('train_model', model_id=model.id) }}"><i class="bi bi-gear"></i> Train Model</a>
+            <a class="main-action" href="{{ url_for('predict', model_id=model.id) }}"><i class="bi bi-stars"></i> Predict</a>
+            <a class="download-action" href="{{ url_for('download_data', model_id=model.id) }}">
+                <i class="bi bi-cloud-arrow-down"></i> Download Dataset (Excel)
+            </a>
+        </div>
+        
+        <hr>
+
+        <h2><i class="bi bi-table"></i> Collected Data ({{ training_data|length }} samples)</h2>
+        
+        {% if training_data %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ model.data_field.capitalize() if model.data_field and model.data_field != 'None' else 'Data Value' }}</th>
+                        <th>Assigned Label</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in training_data %}
+                    <tr>
+                        <td>{{ item[0] }}</td>
+                        <td>**{{ item[1] }}**</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: #6c757d;">No training data has been added to this model yet. Start by clicking 'Add Data'.</p>
+        {% endif %}
+        
+        <p style="margin-top: 30px;"><a href="{{ url_for('index') }}" style="color: #007bff;"><i class="bi bi-arrow-left-circle"></i> Back to All Models</a></p>
+    </div>
 </body>
 </html>

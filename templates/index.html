@@ -2,18 +2,130 @@
 <html>
 <head>
     <title>All Models</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Light Gradient Background */
+            background: linear-gradient(135deg, #e0f7fa, #f0f8ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333; /* Dark text */
+        }
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 30px;
+            border-radius: 16px;
+            /* Light, solid container with subtle shadow */
+            background: #ffffff; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #1e3a8a; /* Dark Blue Heading */
+            border-bottom: 2px solid #90caf9;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+        h2 {
+            color: #1e3a8a;
+            margin-top: 25px;
+            font-weight: 400;
+        }
+        .action-link {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .action-link:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 15px;
+            margin-bottom: 8px;
+            background: #f8fafd; /* Light blue tint for list items */
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        li:hover {
+            background: #e6f1ff;
+        }
+        .model-actions a {
+            margin-left: 15px;
+            color: #007bff; /* Primary color links */
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>All Models</h1>
-    <a href="{{ url_for('create_model') }}">Create New Model</a>
-    <ul>
-        {% for model in models %}
-            <li>
-                {{ model.name }} |
-                <a href="{{ url_for('model_detail', model_id=model.id) }}">View</a> |
-                <a href="{{ url_for('add_data', model_id=model.id) }}">Add Data</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>ML Model Manager</h1>
+        
+        <a class="action-link" href="{{ url_for('create_model') }}"><i class="bi bi-plus-circle"></i> Create New Model</a>
+        
+        <form method="POST" action="{{ url_for('delete_all') }}" style="display: inline-block; margin-left: 20px;">
+            <button type="submit" class="delete-btn">
+                <i class="bi bi-trash"></i> Delete All Data
+            </button>
+        </form>
+
+        <hr>
+        
+        <h2>Existing Models</h2>
+        <ul>
+            {% for model in models %}
+                <li>
+                    <span>**{{ model.name }}** (ID: {{ model.id }})</span>
+                    <span class="model-actions">
+                        <a href="{{ url_for('model_detail', model_id=model.id) }}"><i class="bi bi-eye"></i> View Details</a>
+                        <a href="{{ url_for('add_data', model_id=model.id) }}"><i class="bi bi-input-cursor-text"></i> Add Data</a>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

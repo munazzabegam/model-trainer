@@ -1,16 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head><title>Predict</title></head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #e0f7fa, #f0f8ff);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #333;
+    }
+    .container {
+        max-width: 600px;
+        width: 90%;
+        padding: 30px;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+    }
+    h2 { 
+        color: #1e3a8a; 
+        border-bottom: 2px solid #90caf9; 
+        padding-bottom: 10px; 
+        margin-bottom: 20px; 
+        font-weight: 400;
+    }
+    h3 {
+        color: #1e3a8a;
+        background: #e9f5ff; /* Light blue box for prediction */
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        border: 1px solid #cce5ff;
+    }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+    textarea, select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        background: #f8fafd;
+        color: #333;
+        resize: vertical;
+    }
+    button {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Feedback Button Styles */
+    .predict-btn { background-color: #007bff; color: white; }
+    .correct-btn { background-color: #28a745; color: white; }
+    .incorrect-btn { background-color: #dc3545; color: white; }
+    
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+    
+    hr {
+        border: 0;
+        height: 1px;
+        background: #ddd;
+        margin: 20px 0;
+    }
+</style>
 <body>
-  <h2>Predict using {{ model_name }}</h2>
-  <form method="POST">
-    <label>Enter {{ data_field }}:</label><br>
-    <textarea name="text" rows="4" cols="40" required></textarea><br><br>
-    <button type="submit">Predict</button>
-  </form>
+    <div class="container">
+        <h2><i class="bi bi-stars"></i> Predict using {{ model.name }}</h2>
+        <form method="POST">
+            <label>Enter {{ model.data_field }}:</label><br>
+            <textarea name="text" rows="4" cols="40" required>{{ input_text or '' }}</textarea><br><br>
+            <button type="submit" class="predict-btn">Predict</button>
+        </form>
 
-  {% if prediction %}
-    <h3>Prediction: {{ prediction }}</h3>
-  {% endif %}
+        {% if prediction and prediction_id %}
+            <hr>
+            <h3>Prediction: **{{ prediction }}**</h3>
+            
+            {% set current_input_text = input_text or '' %}
+
+            <p style="font-weight: 600; color: #555;">Was the prediction correct? (This data can be used for retraining!)</p>
+            
+            <form method="POST" action="{{ url_for('feedback', prediction_id=prediction_id, model_id=model.id) }}" style="display:inline-block;">
+                <input type="hidden" name="action" value="correct">
+                <input type="hidden" name="predicted_label" value="{{ prediction }}">
+                <input type="hidden" name="input_text" value="{{ current_input_text }}">
+                <button type="submit" class="correct-btn">
+                    <i class="bi bi-check-circle-fill"></i> Yes, Correct!
+                </button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('feedback', prediction_id=prediction_id, model_id=model.id) }}" style="display:inline-block; margin-left: 20px;">
+                <input type="hidden" name="action" value="incorrect">
+                <input type="hidden" name="input_text" value="{{ current_input_text }}">
+                <label for="true_label"><i class="bi bi-x-circle-fill"></i> True Label:</label>
+                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                    <select name="true_label" required style="width: 150px; margin: 0;">
+                        {% for label in labels_list %}
+                            <option value="{{ label }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="incorrect-btn">
+                        Submit True Label
+                    </button>
+                </div>
+            </form>
+            
+        {% elif prediction %}
+             <hr>
+             <h3>Prediction: **{{ prediction }}**</h3>
+        {% endif %}
+    </div>
 </body>
 </html>

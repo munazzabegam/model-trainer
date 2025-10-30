@@ -1,3 +1,4 @@
+//add_data.html
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,13 +7,20 @@
 <body>
     <h1>Add Data to Model: {{ model.name }}</h1>
     <form method="POST">
-        <label>{{ model.data_field.capitalize() if model.data_field else 'Data' }}:</label><br>
-        <input type="text" name="data_value" required><br><br>
+        <label>
+            {{ model.data_field.capitalize() if model.data_field and model.data_field != 'None' else 'Data' }}:
+        </label><br>
+        <textarea name="data_value" rows="4" cols="50" required></textarea><br><br>
 
-        <label>Labels (comma-separated):</label><br>
-        <input type="text" name="labels" value="{{ model.labels }}"><br><br>
+        <label>Label for this data point:</label><br>
+        <select name="label" required>
+            {% for label in labels_list %}
+                <option value="{{ label }}">{{ label }}</option>
+            {% endfor %}
+        </select><br><br>
 
         <input type="submit" value="Add Data">
     </form>
+    <p><a href="{{ url_for('model_detail', model_id=model.id) }}">Back to Model Details</a></p>
 </body>
 </html>
